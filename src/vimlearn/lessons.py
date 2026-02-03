@@ -335,6 +335,56 @@ c 命令是 d + i 的快捷方式。比如：
             ),
         ],
     ),
+    Lesson(
+        id="2.4",
+        title="其他实用编辑",
+        module="编辑操作",
+        module_num=2,
+        description="学习合并行、大小写转换等实用操作",
+        explanation="""
+这些命令在日常编辑中非常实用：
+
+合并行：
+  J - 将下一行合并到当前行（用空格连接）
+  gJ - 合并行但不加空格
+
+大小写转换：
+  ~ - 切换光标下字符的大小写
+  gu{motion} - 转小写（如 guw 转换单词）
+  gU{motion} - 转大写（如 gUw 转换单词）
+  guu - 整行转小写
+  gUU - 整行转大写
+
+交换技巧：
+  xp - 交换两个字符（先删除再粘贴）
+  ddp - 交换两行
+""",
+        why="""
+这些命令的实际用途：
+
+1. J 合并行：格式化代码、合并被错误换行的文本
+2. ~ 大小写：快速修正大小写错误
+3. xp 交换：修正 teh -> the 这类拼写错误
+""",
+        exercises=[
+            Exercise(
+                instruction="使用 J 将两行合并为一行",
+                initial="Hello\nWorld",
+                expected="Hello World",
+                hint="按 J 合并下一行到当前行",
+                commands_to_learn=["J"],
+                cursor_position=0,
+            ),
+            Exercise(
+                instruction="使用 gUw 将单词转为大写",
+                initial="hello world",
+                expected="HELLO world",
+                hint="按 gUw 将第一个单词转大写",
+                commands_to_learn=["gUw", "~"],
+                cursor_position=0,
+            ),
+        ],
+    ),
 ]
 
 
@@ -574,6 +624,14 @@ Vim 有三种可视模式用于选择文本：
                 commands_to_learn=["v", "U"],
                 cursor_position=7,
             ),
+            Exercise(
+                instruction="使用 V 选中两行代码，然后按 > 增加缩进",
+                initial="line1\nline2\nline3",
+                expected="line1\n\tline2\n\tline3",
+                hint="按 j 到第二行，按 V 选中，按 j 再选一行，按 > 缩进",
+                commands_to_learn=[">", "<"],
+                cursor_position=0,
+            ),
         ],
     ),
     Lesson(
@@ -651,6 +709,14 @@ MODULE_6_LESSONS = [
                 expected="学习 vim 很有趣\nvim 是最好的编辑器\n我爱 vim",
                 hint="输入 /vim 然后按 Enter，按 n 跳到下一个",
                 commands_to_learn=["/", "n"],
+                cursor_position=0,
+            ),
+            Exercise(
+                instruction="将光标移到 'error' 上，按 * 搜索所有 error，然后 :noh 清除高亮",
+                initial="error: file not found\nwarning: deprecated\nerror: timeout",
+                expected="error: file not found\nwarning: deprecated\nerror: timeout",
+                hint="移动到 error，按 * 搜索，输入 :noh 清除高亮，:wq 退出",
+                commands_to_learn=["*", ":noh"],
                 cursor_position=0,
             ),
         ],
@@ -878,13 +944,201 @@ MODULE_7_LESSONS = [
 ]
 
 
-# Module 8: 实用配置
+# Module 8: 文件与 Shell
 MODULE_8_LESSONS = [
     Lesson(
         id="8.1",
+        title="文件保存与退出",
+        module="文件与 Shell",
+        module_num=8,
+        description="掌握各种保存和退出方式",
+        explanation="""
+文件操作是服务器工作的基础：
+
+保存：
+  :w - 保存当前文件
+  :w filename - 另存为新文件
+  :w! - 强制保存（覆盖只读）
+
+退出：
+  :q - 退出（未修改时）
+  :q! - 强制退出（放弃修改）
+  :wq 或 :x 或 ZZ - 保存并退出
+  :wq! - 强制保存并退出
+
+组合：
+  :wa - 保存所有文件
+  :qa - 退出所有文件
+  :wqa - 保存并退出所有
+""",
+        why="""
+服务器上的常见场景：
+
+1. 编辑配置文件后 :wq 保存退出
+2. 改错了用 :q! 放弃修改
+3. 没有权限时用 :w !sudo tee % 保存
+4. ZZ 是最快的保存退出方式
+""",
+        exercises=[
+            Exercise(
+                instruction="使用 ZZ 快速保存并退出（比 :wq 更快）",
+                initial="学会 ZZ 可以更快退出",
+                expected="学会 ZZ 可以更快退出",
+                hint="直接按大写 ZZ（Shift+z 两次）",
+                commands_to_learn=["ZZ", ":wq", ":q!"],
+                cursor_position=0,
+            ),
+        ],
+    ),
+    Lesson(
+        id="8.2",
+        title="打开与切换文件",
+        module="文件与 Shell",
+        module_num=8,
+        description="学习在 Vim 中打开和切换多个文件",
+        explanation="""
+打开文件：
+  :e filename - 打开文件 (edit)
+  :e! - 重新加载当前文件（放弃修改）
+  :e . - 打开文件浏览器（当前目录）
+
+缓冲区（打开的文件列表）：
+  :ls 或 :buffers - 列出所有缓冲区
+  :bn - 下一个缓冲区 (buffer next)
+  :bp - 上一个缓冲区 (buffer previous)
+  :b2 - 跳到第 2 个缓冲区
+  :bd - 关闭当前缓冲区 (buffer delete)
+
+快速切换：
+  Ctrl-^ - 切换到上一个文件
+""",
+        why="""
+服务器上经常需要同时编辑多个文件：
+
+1. 编辑代码时参考另一个文件
+2. 同时修改配置文件和脚本
+3. 对比不同版本的文件
+
+缓冲区比反复打开关闭文件高效得多。
+""",
+        exercises=[
+            Exercise(
+                instruction="这是了解性课程，直接 :wq 保存退出",
+                initial="# 试试 :e . 浏览目录\n# 用 :ls 查看打开的文件",
+                expected="# 试试 :e . 浏览目录\n# 用 :ls 查看打开的文件",
+                hint="输入 :wq 保存退出",
+                commands_to_learn=[":e", ":ls", ":bn", ":bp"],
+                cursor_position=0,
+            ),
+        ],
+    ),
+    Lesson(
+        id="8.3",
+        title="执行 Shell 命令",
+        module="文件与 Shell",
+        module_num=8,
+        description="在 Vim 中执行外部命令",
+        explanation="""
+在 Vim 中执行 Shell 命令非常实用：
+
+执行命令：
+  :!command - 执行命令并显示结果
+  :!ls - 列出目录
+  :!pwd - 显示当前路径
+  :!bash - 临时进入 shell（exit 返回）
+
+读取命令输出到文件：
+  :r !command - 将命令输出插入光标下方
+  :r !date - 插入当前日期
+  :r !cat file - 插入另一个文件内容
+
+将选中内容传给命令：
+  :%!sort - 对整个文件排序
+  :'<,'>!sort - 对选中行排序
+
+挂起 Vim：
+  Ctrl-z - 挂起 Vim 回到 shell
+  fg - 在 shell 中输入 fg 返回 Vim
+""",
+        why="""
+服务器工作中的实际用途：
+
+1. :!ls 查看目录不用退出 Vim
+2. :r !date 快速插入时间戳
+3. :%!jq . 格式化 JSON 文件
+4. Ctrl-z 临时执行其他任务后返回
+""",
+        exercises=[
+            Exercise(
+                instruction="使用 :r !date 在第二行插入当前日期时间",
+                initial="日志记录：",
+                expected="日志记录：",
+                hint="按 j 到第一行末尾，输入 :r !date",
+                commands_to_learn=[":!", ":r !"],
+                cursor_position=0,
+            ),
+        ],
+    ),
+    Lesson(
+        id="8.4",
+        title="查看大文件",
+        module="文件与 Shell",
+        module_num=8,
+        description="高效浏览和查看大文件",
+        explanation="""
+服务器上经常需要查看日志等大文件：
+
+只读打开（防止误修改）：
+  vim -R file 或 view file
+
+快速浏览：
+  Ctrl-f - 向下翻页
+  Ctrl-b - 向上翻页
+  Ctrl-d - 向下半页
+  Ctrl-u - 向上半页
+  gg - 跳到文件开头
+  G - 跳到文件末尾
+  50% - 跳到文件 50% 位置
+
+搜索定位：
+  /error - 搜索 error
+  ?error - 向上搜索
+  n/N - 下一个/上一个匹配
+  * - 搜索光标下的单词
+
+显示信息：
+  Ctrl-g - 显示文件名和位置
+  g Ctrl-g - 显示详细统计
+""",
+        why="""
+查看服务器日志的技巧：
+
+1. 用 G 跳到末尾看最新日志
+2. 用 ?error 从后往前搜索错误
+3. 用 :set nowrap 避免长行换行
+4. 用 view 打开防止误修改
+""",
+        exercises=[
+            Exercise(
+                instruction="使用 G 跳到末尾，然后 ?ERROR 向上搜索",
+                initial="INFO: 启动服务\nINFO: 连接数据库\nERROR: 连接失败\nINFO: 重试中",
+                expected="INFO: 启动服务\nINFO: 连接数据库\nERROR: 连接失败\nINFO: 重试中",
+                hint="按 G 到末尾，输入 ?ERROR 回车",
+                commands_to_learn=["G", "?", "Ctrl-f", "Ctrl-b"],
+                cursor_position=0,
+            ),
+        ],
+    ),
+]
+
+
+# Module 9: 实用配置
+MODULE_9_LESSONS = [
+    Lesson(
+        id="9.1",
         title="行号与相对行号",
         module="实用配置",
-        module_num=8,
+        module_num=9,
         description="学习配置行号显示",
         explanation="""
 行号配置命令（在 Vim 中输入）：
@@ -924,10 +1178,10 @@ MODULE_8_LESSONS = [
         ],
     ),
     Lesson(
-        id="8.2",
+        id="9.2",
         title="搜索配置",
         module="实用配置",
-        module_num=8,
+        module_num=9,
         description="学习优化搜索体验的配置",
         explanation="""
 搜索相关配置：
@@ -967,10 +1221,10 @@ smartcase 是什么？
         ],
     ),
     Lesson(
-        id="8.3",
+        id="9.3",
         title="缩进与制表符",
         module="实用配置",
-        module_num=8,
+        module_num=9,
         description="学习配置缩进行为",
         explanation="""
 缩进相关配置：
@@ -1011,13 +1265,13 @@ Tab vs 空格之争？
 ]
 
 
-# Module 9: 宏与重复
-MODULE_9_LESSONS = [
+# Module 10: 宏与重复
+MODULE_10_LESSONS = [
     Lesson(
-        id="9.1",
+        id="10.1",
         title="点命令重复",
         module="宏与重复",
-        module_num=9,
+        module_num=10,
         description="学习使用点命令重复操作",
         explanation="""
 点命令 (.) 是 Vim 最强大的命令之一：
@@ -1063,10 +1317,10 @@ MODULE_9_LESSONS = [
         ],
     ),
     Lesson(
-        id="9.2",
+        id="10.2",
         title="宏录制与播放",
         module="宏与重复",
-        module_num=9,
+        module_num=10,
         description="学习录制和使用宏",
         explanation="""
 宏可以录制一系列操作并重复播放：
@@ -1109,13 +1363,13 @@ MODULE_9_LESSONS = [
 ]
 
 
-# Module 10: 插件与进阶
-MODULE_10_LESSONS = [
+# Module 11: 插件与进阶
+MODULE_11_LESSONS = [
     Lesson(
-        id="10.1",
+        id="11.1",
         title="插件管理器",
         module="插件与进阶",
-        module_num=10,
+        module_num=11,
         description="了解 Vim 插件生态",
         explanation="""
 Vim 有丰富的插件生态。常用插件管理器：
@@ -1157,10 +1411,10 @@ Vim 本身已经很强大，但插件可以：
         ],
     ),
     Lesson(
-        id="10.2",
+        id="11.2",
         title="常用插件推荐",
         module="插件与进阶",
-        module_num=10,
+        module_num=11,
         description="了解最实用的 Vim 插件",
         explanation="""
 强烈推荐的插件：
@@ -1204,10 +1458,10 @@ Vim 本身已经很强大，但插件可以：
         ],
     ),
     Lesson(
-        id="10.3",
+        id="11.3",
         title="vimrc 配置建议",
         module="插件与进阶",
-        module_num=10,
+        module_num=11,
         description="学习配置你自己的 vimrc",
         explanation="""
 推荐的 ~/.vimrc 基础配置：
@@ -1305,21 +1559,27 @@ MODULES = [
     ),
     Module(
         num=8,
-        title="实用配置",
-        description="学习常用的 Vim 配置选项",
+        title="文件与 Shell",
+        description="文件操作和 Shell 命令集成",
         lessons=MODULE_8_LESSONS,
     ),
     Module(
         num=9,
-        title="宏与重复",
-        description="学习点命令和宏录制",
+        title="实用配置",
+        description="学习常用的 Vim 配置选项",
         lessons=MODULE_9_LESSONS,
     ),
     Module(
         num=10,
+        title="宏与重复",
+        description="学习点命令和宏录制",
+        lessons=MODULE_10_LESSONS,
+    ),
+    Module(
+        num=11,
         title="插件与进阶",
         description="了解插件生态和配置建议",
-        lessons=MODULE_10_LESSONS,
+        lessons=MODULE_11_LESSONS,
     ),
 ]
 
